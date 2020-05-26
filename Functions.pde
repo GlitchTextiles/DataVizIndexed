@@ -40,14 +40,26 @@ public PGraphics render(int start, String renderMode, String colorMode, boolean 
     break;
   case "DIAGONAL":
     graphics.loadPixels();
+    println(diagDir);
+    int yp = 0;
     for (int y = 0; y < graphics.height; y++) {
       for (int x = 0; x < graphics.width; x++) {
+        
+        if (diagDir.equals("DOWN")) {
+          yp =(graphics.height-1) -y;
+        } else {
+          yp = y;
+        }
+        
+        color c = (sequence.get((yp+start+x) % sequence.size()).c ^ mask);
+        int p = y*graphics.width+x;
+        
         if (colorMode.equals("RGB")) {
-          graphics.pixels[y*graphics.width+x]=palette.rgbClosest(sequence.get((y+start+x) % sequence.size()).c ^ mask).c;
+          graphics.pixels[p]=palette.rgbClosest(c).c;
         } else if (colorMode.equals("HSB")) {
-          graphics.pixels[y*graphics.width+x]=palette.hsbClosest(sequence.get((y+start+x) % sequence.size()).c ^ mask).c;
+          graphics.pixels[p]=palette.hsbClosest(c).c;
         } else if (colorMode.equals("AVG")) {
-          graphics.pixels[y*graphics.width+x]=palette.closest(sequence.get((y+start+x) % sequence.size()).c ^ mask).c;
+          graphics.pixels[p]=palette.closest(c).c;
         }
       }
     }
@@ -93,7 +105,7 @@ public PGraphics PCWScale(PGraphics graphic) {
       for (int x = 0; x < linesAdded.width; x++) {
         linesAdded.pixels[y*linesAdded.width+x] = graphic.pixels[row*graphic.width+x];
       }
-      if (y%41 != 0) row++;
+      if (y % 41 != 0) row++;
     }
     linesAdded.updatePixels();
     linesAdded.endDraw();

@@ -3,9 +3,28 @@
 // Available when the design window is active
 
 void keyPressed() {
-
+  
+  float value; // temp place holder
+  
   switch(key) {
-
+    //order
+  case '[':
+  value = gui.cp5.getController("order").getValue();
+  if (value > 0) gui.cp5.getController("order").setValue(value-1);
+  break;
+  case ']':
+  value = gui.cp5.getController("order").getValue();
+  if (value < orders.length) gui.cp5.getController("order").setValue(value+1);
+  break;
+  //shift
+  case '{':
+  value = gui.cp5.getController("shift").getValue();
+  if (value > 0) gui.cp5.getController("shift").setValue(value-1);
+  break;
+  case '}':
+  value = gui.cp5.getController("shift").getValue();
+  if (value < palette.swatches.size()-64) gui.cp5.getController("shift").setValue(value+1);
+  break;
   case ',': // decrease sortMode value
     if (sortMode > 0) --sortMode;
     break;

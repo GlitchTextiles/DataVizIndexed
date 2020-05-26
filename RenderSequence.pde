@@ -23,8 +23,6 @@ int ControlFrame_h = 800;
 int GUILocationX = 0;
 int GUILocationY = 10;
 String GUIName = "GUI";
-int order = 0; // index for assigning base pair values
-int order_shift = 0; // when mapped to index the palette, this shifts the index
 
 int screen_width = 768;
 int screen_height = 1000;
@@ -35,8 +33,10 @@ Swatches palette, sequence, randomized;
 PGraphics rendered;
 byte[] rawData;
 int offset=100, step, linearScale, sortMode;
+int order = 0; // index for assigning base pair values
+int order_shift = 0; // when mapped to index the palette, this shifts the index
 boolean invert, PCW, mapped;
-String renderMode, colorMode;
+String renderMode, colorMode, diagDir;
 
 String sequencePath;
 String[] sequences;
@@ -66,6 +66,7 @@ public void setup() {
 
   offset=0; // start of the sequence
   step=100; //for use with keybindings, increments offset
+  diagDir= "DOWN";
   renderMode="HORIZONTAL";
   colorMode="RGB";
   sortMode=0;
@@ -79,7 +80,6 @@ public void setup() {
 
   //setup GUI
   gui = new ControlFrame(this, GUILocationX, GUILocationY, ControlFrame_w, ControlFrame_h, GUIName);
-
   noLoop();
   noSmooth();
 }
