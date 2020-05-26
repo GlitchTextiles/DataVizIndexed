@@ -3,16 +3,14 @@
 // Written from self-quarantine by Phillip David Stearns May 6th, 2020
 // Genome source: https://www.ncbi.nlm.nih.gov/nuccore/NC_045512.2?report=fasta
 
-/*
-Alternate mode of generating palette
- Limit Palette to # of nucleoide combinations 4^3=64
- 1. Sort the PCW palette by most saturated
- 2. Pick the top 64
- 3. Map nucleotide triplets to the palette
- */
+//====================================================================================
+// libraries
 
 import java.util.*;
 import controlP5.*;
+
+//====================================================================================
+// Global variables
 
 // ControlFrame for GUI
 ControlFrame gui;
@@ -24,6 +22,7 @@ int GUILocationX = 0;
 int GUILocationY = 10;
 String GUIName = "GUI";
 
+//main window dimensions and location
 int screen_width = 768;
 int screen_height = 1000;
 int WindowLocationX = ControlFrame_w;
@@ -32,7 +31,7 @@ int WindowLocationY = 10;
 Swatches palette, sequence, randomized;
 PGraphics rendered;
 byte[] rawData;
-int offset=100, step, linearScale, sortMode;
+int offset, step, linearScale, sortMode;
 int order = 0; // index for assigning base pair values
 int order_shift = 0; // when mapped to index the palette, this shifts the index
 boolean invert, PCW, mapped;
@@ -40,7 +39,7 @@ String renderMode, colorMode, diagDir;
 
 String sequencePath;
 String[] sequences;
-int selection=0;
+int selection = 0;
 
 public void setup() {
   size(10, 10); // final size of a PPCW throw design
@@ -64,14 +63,14 @@ public void setup() {
   }
   println();
 
-  offset=0; // start of the sequence
-  step=100; //for use with keybindings, increments offset
-  diagDir= "DOWN";
-  renderMode="HORIZONTAL";
-  colorMode="RGB";
-  sortMode=0;
-  PCW=true;
-  linearScale=1;
+  offset = 0; // start of the sequence
+  step = 100; //for use with keybindings, increments offset
+  diagDir = "DOWN";
+  renderMode = "HORIZONTAL";
+  colorMode = "RGB";
+  sortMode = 0;
+  PCW = true;
+  linearScale = 1;
 
   //needs to be done when setting sortMode
   sortPalette(sortMode);
