@@ -38,25 +38,27 @@ boolean invert, PCW, mapped;
 String renderMode, colorMode, diagDir;
 
 String sequencePath;
-String[] sequences;
+String[] sequences, sequenceList;
 int selection = 0;
 
 public void setup() {
   size(10, 10); // final size of a PPCW throw design
   surface.setSize(screen_width, screen_height);
   surface.setLocation(ControlFrame_w, 0);
+
   background(0);
-  
+
   //load the palette: convert from hex values in a .txt to Swatches object
   palette = new Swatches(loadStrings(dataPath("")+"/palette/palette.txt"));
-  
+
   //create a randomized palette from a copy
   randomized = new Swatches();
   randomized.replaceSwatches(palette.copySwatches().randomize());
-  
+
   //load the data for the sequences
   sequencePath = dataPath("")+"/sequences/"; //absolute path to included sequences
   sequences = new File(sequencePath).list(); //list of sequence filenames
+  sequenceList = sequences.clone();
   printArray(sequences);
   for (int i = 0; i < sequences.length; i++) {
     sequences[i] = sequencePath+sequences[i]; //prepends absolute path to filenames
@@ -78,13 +80,31 @@ public void setup() {
   loadSequence(sequences[selection]);
 
   //setup GUI
-  gui = new ControlFrame(this, GUILocationX, GUILocationY, ControlFrame_w, ControlFrame_h, GUIName);
+  gui = new ControlFrame(this, GUILocationX, GUILocationY, ControlFrame_w, ControlFrame_h);
+
   noLoop();
   noSmooth();
+  
+  int count = -1;
+  while ( count != 0 ) {
+    int nulls = 0;
+    for (int i = 0; i < gui.shifters.length; ++i) {
+      if (gui.shifters[i] == null) {
+        ++nulls;
+      }
+    }
+    count = nulls;
+  }
+  
 }
 
 public void draw() {
   background(0);
   rendered = render(offset, renderMode, colorMode, invert);
+  for (int i = 0 ; i < gui.shifters.length ; ++i){
+    if (gui.shifters[i].isEnabled()){
+      gui.shifters[i].process(rendered);
+    }
+  }
   image(rendered, 0, 0);
 }

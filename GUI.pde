@@ -2,8 +2,6 @@
 // GUI
 //////////////////////////////////////////////
 
-int row[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-int col[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
 int GUIBuffer=10;
 int GUISize=30;
 
@@ -11,21 +9,21 @@ RadioButton sequence_radio, render_radio, mapping_radio, color_radio, sort_radio
 
 public class ControlFrame extends PApplet {
 
+  controlP5.Label label;
+  Shifter[] shifters = new Shifter[8];
   int w, h, x, y;
-  String name="";
   PApplet parent;
   ControlP5 cp5;
   boolean shift = false;
   float value = 0.0;
 
-  public ControlFrame(PApplet _parent, int _x, int _y, int _w, int _h, String _name) {
+  public ControlFrame(PApplet _parent, int _x, int _y, int _w, int _h) {
     super();   
     parent = _parent;
     w=_w;
     h=_h;
     x=_x;
     y=_y;
-    name = _name;
     PApplet.runSketch(new String[]{this.getClass().getName()}, this);
   }
 
@@ -34,15 +32,18 @@ public class ControlFrame extends PApplet {
   }
 
   public void setup() {
-    controlP5.Label label;
     surface.setSize(w, h);
     surface.setLocation(x, y);
     cp5 = new ControlP5(this);
-    frameRate(10);
+    frameRate(30);
+    for (int i = 0; i < shifters.length; ++i) {
+      shifters[i] = new Shifter(grid(0) - GUIBuffer, grid(10) - GUIBuffer, GUISize, GUIBuffer, this);
+      shifters[i].hide();
+    }
 
     //controls
     cp5.addBang("quit")
-      .setPosition(h(0), v(0))
+      .setPosition(grid(0), grid(0))
       .setSize(GUISize, GUISize)
       .setLabel("quit")
       ;
@@ -51,7 +52,7 @@ public class ControlFrame extends PApplet {
     label.getStyle().setPaddingLeft(5);
 
     cp5.addBang("save")
-      .setPosition(h(2), v(0))
+      .setPosition(grid(2), grid(0))
       .setSize(GUISize, GUISize)
       .setLabel("save")
       ;
@@ -59,9 +60,10 @@ public class ControlFrame extends PApplet {
     label.align(ControlP5.RIGHT_OUTSIDE, CENTER);
     label.getStyle().setPaddingLeft(5);
 
+    //convert to ScrollableList
     sequence_radio = cp5.addRadioButton("select_sequence")
       .setLabel("sequence")
-      .setPosition(h(0), v(1))
+      .setPosition(grid(0), grid(1))
       .setSize(GUISize, GUISize)
       .setItemsPerRow(4)
       .setSpacingColumn((GUISize+GUIBuffer)+GUIBuffer)
@@ -74,16 +76,16 @@ public class ControlFrame extends PApplet {
       .setValue(0)
       ;
 
-    cp5.addSlider("start")
+    cp5.addSlider("seq_offset")
       .setLabel ("start")
       .setRange(0, 1)
       .setSize(this.width-(2*GUIBuffer)-GUISize, GUISize)
-      .setPosition(h(0), v(2));
+      .setPosition(grid(0), grid(2));
     ;
 
     render_radio = cp5.addRadioButton("render_mode")
       .setLabel("render mode")
-      .setPosition(h(0), v(3))
+      .setPosition(grid(0), grid(3))
       .setSize(GUISize, GUISize)
       .setItemsPerRow(4)
       .setSpacingColumn((GUISize+GUIBuffer)+GUIBuffer)
@@ -96,7 +98,7 @@ public class ControlFrame extends PApplet {
       .setValue(0)
       ;
     cp5.addToggle("direction")
-      .setPosition(h(5)+5, v(3))
+      .setPosition(grid(5)+5, grid(3))
       .setSize(GUISize-10, GUISize-10)
       .setLabel("!")
       .setValue(0)
@@ -107,7 +109,7 @@ public class ControlFrame extends PApplet {
 
     color_radio = cp5.addRadioButton("color_mode")
       .setLabel("color mode")
-      .setPosition(h(0), v(4))
+      .setPosition(grid(0), grid(4))
       .setSize(GUISize, GUISize)
       .setItemsPerRow(4)
       .setSpacingColumn((GUISize+GUIBuffer)+GUIBuffer)
@@ -120,7 +122,7 @@ public class ControlFrame extends PApplet {
       ;
 
     cp5.addToggle("invert")
-      .setPosition(h(0), v(5))
+      .setPosition(grid(0), grid(5))
       .setSize(GUISize, GUISize)
       .setLabel("invert")
       .setValue(0)
@@ -131,7 +133,7 @@ public class ControlFrame extends PApplet {
 
     mapping_radio = cp5.addRadioButton("mapping")
       .setLabel("mapping")
-      .setPosition(h(2), v(5))
+      .setPosition(grid(2), grid(5))
       .setSize(GUISize, GUISize)
       .setItemsPerRow(4)
       .setSpacingColumn((GUISize+GUIBuffer)+GUIBuffer)
@@ -144,15 +146,14 @@ public class ControlFrame extends PApplet {
 
     cp5.addSlider("order")
       .setLabel ("order")
-      .setPosition(h(6), v(5))
+      .setPosition(grid(6), grid(5))
       .setRange(0, orders.length-1)
       .setSize(120, GUISize)
       .setNumberOfTickMarks(orders.length-1)
       ;
-
     cp5.addSlider("shift")
       .setLabel ("shift")
-      .setPosition(h(6), v(6))
+      .setPosition(grid(6), grid(6))
       .setRange(0, palette.swatches.size()-64-1)
       .setSize(120, GUISize)
       .setNumberOfTickMarks(palette.swatches.size()-64)
@@ -161,7 +162,7 @@ public class ControlFrame extends PApplet {
 
     sort_radio = cp5.addRadioButton("sort_mode")
       .setLabel("sort_mode")
-      .setPosition(h(0), v(6))
+      .setPosition(grid(0), grid(6))
       .setSize(GUISize, GUISize)
       .setItemsPerRow(3)
       .setSpacingColumn((GUISize+GUIBuffer)+GUIBuffer)
@@ -179,7 +180,7 @@ public class ControlFrame extends PApplet {
       ;
 
     cp5.addBang("generate")
-      .setPosition(h(3), v(8))
+      .setPosition(grid(3), grid(8))
       .setSize(GUISize, GUISize)
       .setLabel("randomize")
       .hide()
@@ -187,6 +188,18 @@ public class ControlFrame extends PApplet {
     label = cp5.getController("generate").getCaptionLabel();
     label.align(ControlP5.RIGHT_OUTSIDE, CENTER);
     label.getStyle().setPaddingLeft(5);
+
+    List layers = Arrays.asList("1", "2", "3", "4", "5", "6", "7", "8");
+    cp5.addScrollableList("layer")
+      .setLabel("layer")
+      .setLabelVisible(true)
+      .setPosition(grid(0), grid(10))
+      .setSize(2*GUISize+GUIBuffer, GUISize*5)
+      .setBarHeight(GUISize)
+      .setItemHeight(GUISize)
+      .addItems(layers)
+      .close()
+      ;
   }
 
   public void draw() {
@@ -195,15 +208,18 @@ public class ControlFrame extends PApplet {
 
   // helpers for positioning GUI elements
 
-  int v(int c) {
-    return col[c]*(GUISize+GUIBuffer)+GUIBuffer;
-  }
-
-  int h(int r) {
-    return row[r]*(GUISize+GUIBuffer)+GUIBuffer;
+  int grid(int offset) {
+    return offset*(GUISize+GUIBuffer)+GUIBuffer;
   }
 
   // GUI object fuctions
+
+  public void layer(int theValue) {
+    for ( int i = 0; i < shifters.length; ++i) {
+      shifters[i].hide();
+    }
+    shifters[theValue].show();
+  }
 
   public void order(int theValue) {
     order = theValue;
@@ -214,7 +230,7 @@ public class ControlFrame extends PApplet {
     order_shift = theValue;
     sequence = dataToSwatches(rawData);
   }
-  
+
   public void direction(int theValue) {
     switch(theValue) {
     case 0:
@@ -286,7 +302,7 @@ public class ControlFrame extends PApplet {
   public void select_sequence(int theValue) {
     if (theValue >=0) {
       loadSequence(sequences[theValue]);
-      offset = int(cp5.getController("start").getValue() * sequence.swatches.size());
+      offset = int(cp5.getController("seq_offset").getValue() * sequence.swatches.size());
     }
   }
 
@@ -307,11 +323,12 @@ public class ControlFrame extends PApplet {
     }
   }
 
-  public void start(float theValue) {
+  public void seq_offset(float theValue) {
     offset = int(theValue * sequence.swatches.size());
   }
 
   void mouseReleased() {
     parent.redraw();
   }
+
 }
