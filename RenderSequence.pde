@@ -59,12 +59,10 @@ public void setup() {
   sequencePath = dataPath("")+"/sequences/"; //absolute path to included sequences
   sequences = new File(sequencePath).list(); //list of sequence filenames
   sequenceList = sequences.clone();
-  printArray(sequences);
   for (int i = 0; i < sequences.length; i++) {
     sequences[i] = sequencePath+sequences[i]; //prepends absolute path to filenames
   }
-  println();
-
+  
   offset = 0; // start of the sequence
   step = 100; //for use with keybindings, increments offset
   diagDir = "DOWN";
@@ -85,6 +83,7 @@ public void setup() {
   noLoop();
   noSmooth();
   
+  // needed to make sure all the GUI elements load before exiting setup()
   int count = -1;
   while ( count != 0 ) {
     int nulls = 0;
@@ -101,8 +100,8 @@ public void setup() {
 public void draw() {
   background(0);
   rendered = render(offset, renderMode, colorMode, invert);
-  for (int i = 0 ; i < gui.shifters.length ; ++i){
-    if (gui.shifters[i].isEnabled()){
+  for (int i = 0; i < gui.shifters.length; ++i) {
+    if (gui.shifters[i].isEnabled()) {
       gui.shifters[i].process(rendered);
     }
   }

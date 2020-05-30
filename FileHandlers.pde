@@ -4,6 +4,9 @@ int frameIndex;
 boolean run = true;
 boolean save = false;
 
+//====================================================================================
+// Save functions
+
 public void save_file() {
   selectOutput("Select a file to process:", "outputSelection");
 }
@@ -22,18 +25,10 @@ void save_still(String thePath) {
   rendered.save(thePath);
 }
 
-public void save_sequence() {
-  run=false;
-  selectOutput("Select a file to process:", "outputFolderSelection");
-}
+//====================================================================================
+// Load the Sequence
 
-void outputFolderSelection(File output) {
-  if (output == null) {
-    println("Window was closed or the user hit cancel.");
-  } else {
-    println("User selected " + output.getAbsolutePath());
-    outputPath = output.getAbsolutePath();
-    save = true;
-  }
-  frameIndex=0;
+public void loadSequence(String path) {
+  rawData = loadBytes(path);
+  sequence = dataToSwatches(rawData);
 }
