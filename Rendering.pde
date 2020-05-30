@@ -18,7 +18,7 @@ public PGraphics render(int start, String renderMode, String colorMode, boolean 
       } else if (colorMode.equals("AVG")) {
         graphics.stroke(palette.closest(sequence.get((i+start) % sequence.size()).c ^ mask).c);
       }
-      graphics.line(0, i, graphics.width, i);
+      graphics.line(-1, i, graphics.width, i);
     }
     break;
   case "VERTICAL":
@@ -30,7 +30,7 @@ public PGraphics render(int start, String renderMode, String colorMode, boolean 
       } else if (colorMode.equals("AVG")) {
         graphics.stroke(palette.closest(sequence.get((i+start) % sequence.size()).c ^ mask).c);
       }
-      graphics.line(i, 0, i, graphics.height);
+      graphics.line(i, -1, i, graphics.height);
     }
     break;
   case "DIAGONAL":
