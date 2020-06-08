@@ -321,7 +321,7 @@ public class ControlFrame extends PApplet {
     offset = int(theValue * sequence.swatches.size());
   }
 
-  void mouseReleased() {
-    parent.redraw();
-  }
+    void mouseReleased() {
+      parent.redraw();
+    }
 }

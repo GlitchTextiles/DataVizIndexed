@@ -17,7 +17,7 @@ ControlFrame gui;
 
 //Control Frame Dimensions and Location
 int ControlFrame_w = 400;
-int ControlFrame_h = 800;
+int ControlFrame_h = 550;
 int GUILocationX = 0;
 int GUILocationY = 10;
 String GUIName = "GUI";
@@ -101,7 +101,7 @@ public void draw() {
   background(0);
   rendered = render(offset, renderMode, colorMode, invert);
   for (int i = 0; i < gui.shifters.length; ++i) {
-    if (gui.shifters[i].isEnabled()) {
+    if (gui.shifters[i].isActive()) {
       gui.shifters[i].process(rendered);
     }
   }
