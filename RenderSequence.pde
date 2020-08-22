@@ -41,6 +41,9 @@ String sequencePath;
 String[] sequences, sequenceList;
 int selection = 0;
 
+boolean open = false;
+String type = "DNA"; // DNA, BYTE, CHAR
+
 public void setup() {
   size(10, 10); // final size of a PPCW throw design
   surface.setSize(screen_width, screen_height);
