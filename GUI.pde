@@ -47,6 +47,7 @@ public class ControlFrame extends PApplet {
       .setPosition(grid(0), grid(0))
       .setSize(GUISize, GUISize)
       .setLabel("quit")
+      .hide()
       ;
     label = cp5.getController("quit").getCaptionLabel();
     label.align(ControlP5.RIGHT_OUTSIDE, CENTER);
@@ -56,13 +57,14 @@ public class ControlFrame extends PApplet {
       .setPosition(grid(2), grid(0))
       .setSize(GUISize, GUISize)
       .setLabel("save")
+      .hide()
       ;
     label = cp5.getController("save").getCaptionLabel();
     label.align(ControlP5.RIGHT_OUTSIDE, CENTER);
     label.getStyle().setPaddingLeft(5);
 
     cp5.addSlider("seq_offset")
-      .setLabel ("start")
+      .setLabel ("INDEX")
       .setRange(0, 1)
       .setSize(this.width-(2*GUIBuffer)-GUISize, GUISize)
       .setPosition(grid(0), grid(1));
@@ -82,11 +84,11 @@ public class ControlFrame extends PApplet {
       .activate(0)
       .setValue(0)
       ;
-      
+
     cp5.addToggle("direction")
       .setPosition(grid(5)+5, grid(2))
       .setSize(GUISize-10, GUISize-10)
-      .setLabel("^")
+      .setLabel("/")
       .setValue(0)
       ;
     label = cp5.getController("direction").getCaptionLabel();
@@ -106,6 +108,24 @@ public class ControlFrame extends PApplet {
       .activate(0)
       .setValue(0)
       ;
+
+    cp5.addBang("dec_linear_scale")
+      .setPosition(grid(7)+5, grid(2))
+      .setSize(GUISize-10, GUISize-10)
+      .setLabel("-")
+      ;
+    label = cp5.getController("dec_linear_scale").getCaptionLabel();
+    label.align(ControlP5.RIGHT_OUTSIDE, CENTER);
+    label.getStyle().setPaddingLeft(5);
+
+    cp5.addBang("inc_linear_scale")
+      .setPosition(grid(8)+5, grid(2))
+      .setSize(GUISize-10, GUISize-10)
+      .setLabel("+")
+      ;
+    label = cp5.getController("inc_linear_scale").getCaptionLabel();
+    label.align(ControlP5.RIGHT_OUTSIDE, CENTER);
+    label.getStyle().setPaddingLeft(5);
 
     cp5.addToggle("invert")
       .setPosition(grid(0), grid(4))
@@ -137,7 +157,7 @@ public class ControlFrame extends PApplet {
       .setSize(120, GUISize)
       .setNumberOfTickMarks(orders.length-1)
       ;
-      
+
     cp5.addSlider("shift")
       .setLabel ("shift")
       .setPosition(grid(6), grid(5))
@@ -179,15 +199,30 @@ public class ControlFrame extends PApplet {
     cp5.addButtonBar("layer")
       .setLabel("layer")
       .setPosition(grid(0), grid(8))
-      .setSize(9*GUISize+9*GUIBuffer, GUISize)
+      .setSize(8*GUISize+7*GUIBuffer, GUISize)
       .addItems(split("1 2 3 4 5 6 7 8", " "))
-      .setValue(0)
       ;
+      
+      cp5.addToggle("enable_all")
+      .setPosition(grid(8), grid(8))
+      .setSize(GUISize, GUISize)
+      .setLabel("EN\nALL")
+      ;
+    label = cp5.getController("enable_all").getCaptionLabel();
+    label.align(ControlP5.CENTER, CENTER);
+    
+    cp5.addBang("reset_all")
+      .setPosition(grid(9), grid(8))
+      .setSize(GUISize, GUISize)
+      .setLabel("RESET\nALL")
+      ;
+    label = cp5.getController("reset_all").getCaptionLabel();
+    label.align(ControlP5.CENTER, CENTER);
 
     cp5.addScrollableList("select_sequence")
       .setLabel("select sequence")
-      .setPosition(grid(4), grid(0))
-      .setSize(4*(GUISize+GUIBuffer), 5*GUISize)
+      .setPosition(grid(0), grid(0))
+      .setSize(9*(GUISize+GUIBuffer), 5*GUISize)
       .setBarHeight(GUISize)
       .setItemHeight(GUISize)
       .addItems(Arrays.asList(sequenceList))
@@ -200,12 +235,35 @@ public class ControlFrame extends PApplet {
   }
 
   // helpers for positioning GUI elements
+  boolean shiftersAreLoaded() {
+    int nulls = 0;
+    for (int i = 0; i < this.shifters.length; ++i) {
+      if (this.shifters[i] == null) {
+        ++nulls;
+      }
+    }
+    return nulls == 0;
+  }
 
   int grid(int offset) {
     return offset*(GUISize+GUIBuffer)+GUIBuffer;
   }
 
   // GUI object fuctions
+  
+  public void enable_all(int the_value){
+    for(int i = 0; i < shifters.length; ++i){
+    shifters[i].controls.getController("active").setValue(the_value);
+    }
+  }
+  
+  public void reset_all(){
+    cp5.getController("enable_all").setValue(0);
+    for(int i = 0; i < shifters.length; ++i){
+    shifters[i].reset();
+    }
+    
+  }
 
   public void layer(int theValue) {
     for ( int i = 0; i < shifters.length; ++i) {
@@ -233,6 +291,14 @@ public class ControlFrame extends PApplet {
       diagDir = "UP";
       break;
     }
+  }
+
+  void dec_linear_scale() {
+    if (linearScale>1) --linearScale;
+  }
+
+  void inc_linear_scale() {
+    ++linearScale;
   }
 
   public void invert(int theValue) {
@@ -293,7 +359,6 @@ public class ControlFrame extends PApplet {
   }
 
   public void select_sequence(int theValue) {
-    println("got SelectSequence value: "+theValue);
     if (theValue >=0) {
       loadSequence(sequences[theValue]);
       offset = int(cp5.getController("seq_offset").getValue() * sequence.swatches.size());
@@ -321,7 +386,7 @@ public class ControlFrame extends PApplet {
     offset = int(theValue * sequence.swatches.size());
   }
 
-    void mouseReleased() {
-      parent.redraw();
-    }
+  void mouseReleased() {
+    parent.redraw();
+  }
 }

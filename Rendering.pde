@@ -2,6 +2,7 @@
 // Render the data into a design
 
 public PGraphics render(int start, String renderMode, String colorMode, boolean invert) {
+  color[] colors;
   gui.noLoop();
   int mask = 0;
   PGraphics graphics = createGraphics(screen_width, screen_height); // starting size of a PCW throw design
@@ -35,49 +36,66 @@ public PGraphics render(int start, String renderMode, String colorMode, boolean 
     break;
   case "DIAGONAL":
     graphics.loadPixels();
-    println(diagDir);
-    int yp = 0;
-    for (int y = 0; y < graphics.height; y++) {
-      for (int x = 0; x < graphics.width; x++) {
 
-        if (diagDir.equals("DOWN")) {
-          yp =(graphics.height-1) -y;
-        } else {
-          yp = y;
-        }
+    colors = new color[graphics.width+graphics.height];
 
-        color c = (sequence.get((yp+start+x) % sequence.size()).c ^ mask);
-        int p = y*graphics.width+x;
-
-        if (colorMode.equals("RGB")) {
-          graphics.pixels[p]=palette.rgbClosest(c).c;
-        } else if (colorMode.equals("HSB")) {
-          graphics.pixels[p]=palette.hsbClosest(c).c;
-        } else if (colorMode.equals("AVG")) {
-          graphics.pixels[p]=palette.closest(c).c;
-        }
+    for (int i = 0; i < colors.length; i++) {
+      color c = (sequence.get((start+i) % sequence.size()).c ^ mask);
+      if (colorMode.equals("RGB")) {
+        colors[i]=palette.rgbClosest(c).c;
+      } else if (colorMode.equals("HSB")) {
+        colors[i]=palette.hsbClosest(c).c;
+      } else if (colorMode.equals("AVG")) {
+        colors[i]=palette.closest(c).c;
       }
     }
+
+    for (int y = 0; y < graphics.height; y++) {
+      int i = 0;
+      if (diagDir.equals("DOWN")) {
+        i = (graphics.height-1) - y;
+      } else {
+        i = y;
+      }
+      for (int x = 0; x < graphics.width; x++) {
+        int p = y*graphics.width+x;
+        graphics.pixels[p]=colors[x+i];
+      }
+    }
+
     graphics.updatePixels();
     break;
   case "LINEAR":
     graphics.noStroke();
     int h = int(graphics.height/linearScale) + 1;
     int w = int(graphics.width/linearScale) + 1;
+    
+    if( h*w > sequence.size()){
+      colors = new color[sequence.size()];
+    } else {
+      colors = new color[h*w];
+    }
+    
+    for (int i = 0; i < colors.length; i++) {
+      color c = (sequence.get((start+i) % sequence.size()).c ^ mask);
+      if (colorMode.equals("RGB")) {
+        colors[i]=palette.rgbClosest(c).c;
+      } else if (colorMode.equals("HSB")) {
+        colors[i]=palette.hsbClosest(c).c;
+      } else if (colorMode.equals("AVG")) {
+        colors[i]=palette.closest(c).c;
+      }
+    }
+    
     for (int y = 0; y < h; y++) {
       for (int x = 0; x < w; x++) {
-        if (colorMode.equals("RGB")) {
-          graphics.fill(palette.rgbClosest(sequence.get((y*w+x+start) % sequence.size()).c ^ mask).c);
-        } else if (colorMode.equals("HSB")) {
-          graphics.fill(palette.hsbClosest(sequence.get((y*w+x+start) % sequence.size()).c ^ mask).c);
-        } else if (colorMode.equals("AVG")) {
-          graphics.fill(palette.closest(sequence.get((y*w+x+start) % sequence.size()).c ^ mask).c);
-        }
+        graphics.fill(colors[(y*w+x)%colors.length]);
         graphics.square(x*linearScale, y*linearScale, linearScale);
       }
     }
     break;
   }
+  
   gui.loop();
   graphics.endDraw();
   return graphics;

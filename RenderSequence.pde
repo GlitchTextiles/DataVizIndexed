@@ -16,8 +16,8 @@ import controlP5.*;
 ControlFrame gui;
 
 //Control Frame Dimensions and Location
-int ControlFrame_w = 400;
-int ControlFrame_h = 550;
+int ControlFrame_w = 410;
+int ControlFrame_h = 540;
 int GUILocationX = 0;
 int GUILocationY = 10;
 String GUIName = "GUI";
@@ -73,7 +73,7 @@ public void setup() {
   colorMode = "RGB";
   sortMode = 0;
   PCW = true;
-  linearScale = 1;
+  linearScale = 3;
 
   //needs to be done when setting sortMode
   sortPalette(sortMode);
@@ -87,15 +87,7 @@ public void setup() {
   noSmooth();
   
   // needed to make sure all the GUI elements load before exiting setup()
-  int count = -1;
-  while ( count != 0 ) {
-    int nulls = 0;
-    for (int i = 0; i < gui.shifters.length; ++i) {
-      if (gui.shifters[i] == null) {
-        ++nulls;
-      }
-    }
-    count = nulls;
+  while ( !gui.shiftersAreLoaded() ) {
   }
   
 }

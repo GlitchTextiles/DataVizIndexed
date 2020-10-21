@@ -34,4 +34,5 @@ void save_still(String thePath) {
 public void loadSequence(String path) {
   rawData = loadBytes(path);
   sequence = dataToSwatches(rawData);
+  redraw();
 }
