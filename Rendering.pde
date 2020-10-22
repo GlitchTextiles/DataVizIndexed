@@ -3,7 +3,7 @@
 
 public PGraphics render(int start, String renderMode, String colorMode, boolean invert) {
   color[] colors;
-  gui.noLoop();
+  
   int mask = 0;
   PGraphics graphics = createGraphics(screen_width, screen_height); // starting size of a PCW throw design
   if (invert) mask = 0x00ffffff;
@@ -95,8 +95,6 @@ public PGraphics render(int start, String renderMode, String colorMode, boolean 
     }
     break;
   }
-  
-  gui.loop();
   graphics.endDraw();
   return graphics;
 }

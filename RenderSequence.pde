@@ -12,21 +12,13 @@ import controlP5.*;
 //====================================================================================
 // Global variables
 
-// ControlFrame for GUI
-ControlFrame gui;
-
 //Control Frame Dimensions and Location
-int ControlFrame_w = 410;
-int ControlFrame_h = 540;
-int GUILocationX = 0;
-int GUILocationY = 10;
-String GUIName = "GUI";
+int controls_w = 410;
+int controls_h = 540;
 
 //main window dimensions and location
 int screen_width = 768;
 int screen_height = 1000;
-int WindowLocationX = ControlFrame_w;
-int WindowLocationY = 10;
 
 Swatches palette, sequence, randomized;
 PGraphics rendered;
@@ -46,14 +38,13 @@ String type = "DNA"; // DNA, BYTE, CHAR
 
 public void setup() {
   size(10, 10); // final size of a PPCW throw design
-  surface.setSize(screen_width, screen_height);
-  surface.setLocation(ControlFrame_w, 0);
 
-  background(0);
+  surface.setSize(screen_width+controls_w, screen_height);
+
 
   //load the palette: convert from hex values in a .txt to Swatches object
   palette = new Swatches(loadStrings(dataPath("")+"/palette/palette.txt"));
-
+  
   //create a randomized palette from a copy
   randomized = new Swatches();
   randomized.replaceSwatches(palette.copySwatches().randomize());
@@ -65,7 +56,7 @@ public void setup() {
   for (int i = 0; i < sequences.length; i++) {
     sequences[i] = sequencePath+sequences[i]; //prepends absolute path to filenames
   }
-  
+
   offset = 0; // start of the sequence
   step = 100; //for use with keybindings, increments offset
   diagDir = "DOWN";
@@ -81,24 +72,23 @@ public void setup() {
   loadSequence(sequences[selection]);
 
   //setup GUI
-  gui = new ControlFrame(this, GUILocationX, GUILocationY, ControlFrame_w, ControlFrame_h);
-
-  noLoop();
+  initGUI();
   noSmooth();
-  
+
   // needed to make sure all the GUI elements load before exiting setup()
-  while ( !gui.shiftersAreLoaded() ) {
-  }
+  //while ( !shiftersAreLoaded() ) {
+  //}
   
+  background(0);
 }
 
 public void draw() {
   background(0);
   rendered = render(offset, renderMode, colorMode, invert);
-  for (int i = 0; i < gui.shifters.length; ++i) {
-    if (gui.shifters[i].isActive()) {
-      gui.shifters[i].process(rendered);
+  for (int i = 0; i < shifters.length; ++i) {
+    if (shifters[i].isActive()) {
+      shifters[i].process(rendered);
     }
   }
-  image(rendered, 0, 0);
+  image(rendered, controls_w, 0);
 }
