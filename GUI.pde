@@ -13,8 +13,6 @@ Label label;
 
 public void initGUI() {
   
-
-  
   cp5 = new ControlP5(this);
   
   for (int i = 0; i < shifters.length; ++i) {
@@ -28,25 +26,6 @@ public void initGUI() {
   
 
   //controls
-  cp5.addBang("quit")
-    .setPosition(grid(0), grid(0))
-    .setSize(GUISize, GUISize)
-    .setLabel("quit")
-    .hide()
-    ;
-  label = cp5.getController("quit").getCaptionLabel();
-  label.align(ControlP5.RIGHT_OUTSIDE, CENTER);
-  label.getStyle().setPaddingLeft(5);
-
-  cp5.addBang("save")
-    .setPosition(grid(2), grid(0))
-    .setSize(GUISize, GUISize)
-    .setLabel("save")
-    .hide()
-    ;
-  label = cp5.getController("save").getCaptionLabel();
-  label.align(ControlP5.RIGHT_OUTSIDE, CENTER);
-  label.getStyle().setPaddingLeft(5);
 
   cp5.addSlider("seq_offset")
     .setLabel ("INDEX")
@@ -331,14 +310,6 @@ public void color_mode(int theValue) {
     colorMode = "AVG";
     break;
   }
-}
-
-public void quit() {
-  exit();
-}
-
-public void save() {
-  save_file();
 }
 
 public void select_sequence(int theValue) {

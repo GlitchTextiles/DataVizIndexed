@@ -98,31 +98,3 @@ public PGraphics render(int start, String renderMode, String colorMode, boolean 
   graphics.endDraw();
   return graphics;
 }
-
-//====================================================================================
-// Stretch the images from 1000 to 1025 lines in a PCW friendly manner
-
-public PGraphics PCWScale(PGraphics graphic) {
-  if (graphic == null) {
-    println("PGraphics object is not initialized.");
-    return null;
-  } else if (graphic.height == 1000) {
-    PGraphics linesAdded = createGraphics(graphic.width, 1025);
-    int row = 0;
-    linesAdded.beginDraw();
-    linesAdded.loadPixels();
-    graphic.loadPixels();
-    for (int y = 0; y < linesAdded.height; y++) {
-      for (int x = 0; x < linesAdded.width; x++) {
-        linesAdded.pixels[y*linesAdded.width+x] = graphic.pixels[row*graphic.width+x];
-      }
-      if (y % 41 != 0) row++;
-    }
-    linesAdded.updatePixels();
-    linesAdded.endDraw();
-    return linesAdded;
-  } else {
-    println("Incompatible PGraphics size. Height must be 1000px");
-    return null;
-  }
-}
