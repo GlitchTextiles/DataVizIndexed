@@ -37,10 +37,10 @@ boolean open = false;
 String type = "DNA"; // DNA, BYTE, CHAR
 
 public void setup() {
-  size(10, 10); // final size of a PPCW throw design
+  size(1178, 1000); // final size of a PPCW throw design
 
-  surface.setSize(screen_width+controls_w, screen_height);
-  surface.setLocation(0,0);
+  //surface.setSize(screen_width+controls_w, screen_height);
+  //surface.setLocation(0,0);
 
   //load the palette: convert from hex values in a .txt to Swatches object
   palette = new Swatches(loadStrings(dataPath("")+"/palette/palette.txt"));
