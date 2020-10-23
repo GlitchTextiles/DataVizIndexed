@@ -21,8 +21,11 @@ public void initGUI() {
     shifters[i] = new Shifter(grid(0) - GUIBuffer, grid(9) - GUIBuffer, GUISize, GUIBuffer, this);
     shifters[i].hide();
   }
+  cp5.addTextlabel("Shifter Section")
+                    .setText("Shifters")
+                    .setPosition(grid(0),grid(7))
+                    ;
   
-  shifters[0].show();
 
   //controls
   cp5.addBang("quit")
