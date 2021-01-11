@@ -12,18 +12,18 @@ ControlP5 cp5;
 Label label;
 
 public void initGUI() {
-  
+
   cp5 = new ControlP5(this);
-  
+
   for (int i = 0; i < shifters.length; ++i) {
     shifters[i] = new Shifter(grid(0) - GUIBuffer, grid(9) - GUIBuffer, GUISize, GUIBuffer, this);
     shifters[i].hide();
   }
   cp5.addTextlabel("Shifter Section")
-                    .setText("Shifters")
-                    .setPosition(grid(0),grid(7))
-                    ;
-  
+    .setText("Shifters")
+    .setPosition(grid(0), grid(7))
+    ;
+
 
   //controls
 
@@ -31,8 +31,8 @@ public void initGUI() {
     .setLabel ("INDEX")
     .setRange(0, 1)
     .setSize(9*(GUISize+GUIBuffer), GUISize)
-    .setPosition(grid(0), grid(1));
-  ;
+    .setPosition(grid(0), grid(1))
+    ;
 
   render_radio = cp5.addRadioButton("render_mode")
     .setLabel("render mode")
@@ -72,7 +72,7 @@ public void initGUI() {
     .activate(0)
     .setValue(0)
     .show();
-    ;
+  ;
 
   cp5.addBang("dec_linear_scale")
     .setPosition(grid(7)+5, grid(2))
