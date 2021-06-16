@@ -6,45 +6,57 @@
 //====================================================================================
 // libraries
 
-import java.util.*;
 import controlP5.*;
+import java.util.*;
 
 //====================================================================================
 // Global variables
 
 //Control Frame Dimensions and Location
-int controls_w = 410;
-int controls_h = 540;
+int controls_w = 420;
+int controls_h = 550;
+
+boolean loading = false;
 
 //main window dimensions and location
-int screen_width = 768;
-int screen_height = 1000;
-
+int graphics_width = 96;
+int graphics_height = 500;
+BitSet rawBits = new BitSet();
 Swatches palette, sequence, randomized;
+int palette_depth = 6; //bits
+int palette_size = int(pow(2, palette_depth));
 PGraphics rendered;
-byte[] rawData;
+byte[] rawBytes;
 int offset, step, linearScale, sortMode;
 int order = 0; // index for assigning base pair values
 int order_shift = 0; // when mapped to index the palette, this shifts the index
 boolean invert, PCW, mapped;
-String renderMode, colorMode, diagDir;
+String renderMode; // HORIZONTAL, VERTICAL, DIAGONAL, LINEAR
+String colorMode, diagDir;
+
+int chan1_depth=1;
+int chan2_depth=1;
+int chan3_depth=1;
+int rgb_depth=0;
+int pixel_depth=6;
+int bit_offset=0;
 
 String sequencePath;
+
 String[] sequences, sequenceList;
 int selection = 0;
 
 boolean open = false;
-String type = "DNA"; // DNA, BYTE, CHAR
+String data_type = "DNA"; // DNA, BYTE
 
 public void setup() {
-  size(1178, 1000); // final size of a PPCW throw design
+  size(550, 550);
 
-  //surface.setSize(screen_width+controls_w, screen_height);
-  //surface.setLocation(0,0);
+  setDepth(chan1_depth, chan2_depth, chan3_depth);
 
   //load the palette: convert from hex values in a .txt to Swatches object
   palette = new Swatches(loadStrings(dataPath("")+"/palette/palette.txt"));
-  
+
   //create a randomized palette from a copy
   randomized = new Swatches();
   randomized.replaceSwatches(palette.copySwatches().randomize());
@@ -63,32 +75,31 @@ public void setup() {
   renderMode = "HORIZONTAL";
   colorMode = "RGB";
   sortMode = 0;
-  PCW = true;
+  PCW = false;
   linearScale = 3;
 
   //needs to be done when setting sortMode
   sortPalette(sortMode);
   //needs to be done when new sequences are loaded
-  loadSequence(sequences[selection]);
+  loadData(sequences[selection]);
 
   //setup GUI
   initGUI();
   noSmooth();
 
-  // needed to make sure all the GUI elements load before exiting setup()
-  //while ( !shiftersAreLoaded() ) {
-  //}
-  
   background(0);
 }
 
 public void draw() {
-  background(0);
-  rendered = render(offset, renderMode, colorMode, invert);
-  for (int i = 0; i < shifters.length; ++i) {
-    if (shifters[i].isActive()) {
-      shifters[i].process(rendered);
+  if (!loading) {
+    background(0);
+    sequence = dataToSwatches(offset);
+    rendered = render(renderMode, colorMode, invert);
+    for (int i = 0; i < shifters.length; ++i) {
+      if (shifters[i].isActive()) {
+        shifters[i].process(rendered);
+      }
     }
+    image(rendered, controls_w, GUIBuffer);
   }
-  image(rendered, controls_w, 0);
 }

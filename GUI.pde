@@ -5,7 +5,8 @@
 int GUIBuffer=10;
 int GUISize=30;
 
-RadioButton sequence_radio, render_radio, mapping_radio, color_radio, sort_radio;
+RadioButton sequence_radio, render_radio, mapping_radio, color_radio, sort_radio, data_type_radio;
+Slider order_slider, shift_slider, depth_slider, ch1_slider, ch2_slider, ch3_slider;
 ScrollableList sequence_select;
 Shifter[] shifters = new Shifter[8];
 ControlP5 cp5;
@@ -24,8 +25,34 @@ public void initGUI() {
     .setPosition(grid(0), grid(7))
     ;
 
-
   //controls
+
+  cp5.addBang("quit")
+    .setPosition(grid(0), grid(0))
+    .setSize(GUISize, GUISize)
+    .setLabel("quit")
+    ;
+  label = cp5.getController("quit").getCaptionLabel();
+  label.align(ControlP5.RIGHT_OUTSIDE, CENTER);
+  label.getStyle().setPaddingLeft(5);
+
+  cp5.addBang("save")
+    .setPosition(grid(2), grid(0))
+    .setSize(GUISize, GUISize)
+    .setLabel("save")
+    ;
+  label = cp5.getController("save").getCaptionLabel();
+  label.align(ControlP5.RIGHT_OUTSIDE, CENTER);
+  label.getStyle().setPaddingLeft(5);
+
+  cp5.addBang("open")
+    .setPosition(grid(4), grid(0))
+    .setSize(GUISize, GUISize)
+    .setLabel("open")
+    ;
+  label = cp5.getController("open").getCaptionLabel();
+  label.align(ControlP5.RIGHT_OUTSIDE, CENTER);
+  label.getStyle().setPaddingLeft(5);
 
   cp5.addSlider("seq_offset")
     .setLabel ("INDEX")
@@ -109,13 +136,13 @@ public void initGUI() {
     .setItemsPerRow(4)
     .setSpacingColumn((GUISize+GUIBuffer)+GUIBuffer)
     .setSpacingRow(GUIBuffer)
-    .addItem("GROUP", 0)
-    .addItem("INDEX", 1)
+    .addItem("DIRECT", 0)
+    .addItem("MAPPED", 1)
     .activate(0)
     .setValue(0)
     ;
 
-  cp5.addSlider("order")
+  order_slider = cp5.addSlider("order")
     .setLabel ("order")
     .setPosition(grid(6), grid(3))
     .setRange(0, orders.length-1)
@@ -123,14 +150,27 @@ public void initGUI() {
     .setNumberOfTickMarks(orders.length-1)
     ;
 
-  cp5.addSlider("shift")
+  shift_slider = cp5.addSlider("shift")
     .setLabel ("shift")
     .setPosition(grid(6), grid(4))
-    .setRange(0, palette.swatches.size()-64-1)
+    .setRange(0, palette.swatches.size()-palette_size-1)
     .setSize(120, GUISize)
-    .setNumberOfTickMarks(palette.swatches.size()-64)
+    .setNumberOfTickMarks(palette.swatches.size()-palette_size)
     .hide()
     ;
+
+  data_type_radio = cp5.addRadioButton("data_type")
+    .setLabel("data_type")
+    .setPosition(grid(6), grid(5))
+    .setSize(GUISize, GUISize)
+    .setItemsPerRow(2)
+    .setSpacingColumn((GUISize+GUIBuffer)+GUIBuffer)
+    .setSpacingRow(GUIBuffer)
+    .addItem("DNA", 0)
+    .addItem("BYTES", 1)
+    .activate(0)
+    .setValue(0)
+    ;  
 
   sort_radio = cp5.addRadioButton("sort_mode")
     .setLabel("sort_mode")
@@ -186,12 +226,53 @@ public void initGUI() {
 
   cp5.addScrollableList("select_sequence")
     .setLabel("select sequence")
-    .setPosition(grid(0), grid(0))
-    .setSize(9*(GUISize+GUIBuffer), 5*GUISize)
+    .setPosition(grid(6), grid(0))
+    .setSize(3*(GUISize+GUIBuffer), 5*GUISize)
     .setBarHeight(GUISize)
     .setItemHeight(GUISize)
     .addItems(Arrays.asList(sequenceList))
     .close()
+    ;
+
+  // controls for color channel depth
+  ch1_slider = cp5.addSlider("set_chan1_depth")
+    .setLabel("ch1")
+    .setPosition(grid(6), grid(6))
+    .setSize(120, GUISize/3)
+    .setRange(0, 8)
+    .setValue(1)
+    .setNumberOfTickMarks(9)
+    .hide()
+    ;
+
+  ch2_slider = cp5.addSlider("set_chan2_depth")
+    .setLabel("ch2")
+    .setPosition(grid(6), grid(6)+2*(GUISize+GUIBuffer)/3)
+    .setSize(120, GUISize/3)
+    .setRange(0, 8)
+    .setValue(1)
+    .setNumberOfTickMarks(9)
+    .hide()
+    ;
+
+  ch3_slider = cp5.addSlider("set_chan3_depth")
+    .setLabel("ch3")
+    .setPosition(grid(6), grid(6)+4*(GUISize+GUIBuffer)/3)
+    .setSize(120, GUISize/3)
+    .setRange(0, 8)
+    .setValue(1)
+    .setNumberOfTickMarks(9)
+    .hide()
+    ; 
+
+  depth_slider = cp5.addSlider("depth")
+    .setLabel("depth")
+    .setPosition(grid(6), grid(3))
+    .setSize(120, GUISize)
+    .setRange(1, 6)
+    .setValue(1)
+    .setNumberOfTickMarks(6)
+    .hide()
     ;
 }
 
@@ -211,6 +292,38 @@ int grid(int offset) {
 }
 
 // GUI object fuctions
+
+public void quit() {
+  exit();
+}
+
+public void save() {
+  save_file();
+}
+
+public void open() {
+  selectInput("Select a file to process:", "inputSelection");
+}
+
+public void set_chan1_depth(int _value) {
+    setDepth(_value, chan2_depth, chan3_depth);
+    cp5.getController("seq_offset").setValue(cp5.getController("seq_offset").getValue());
+  }
+
+  public void set_chan2_depth(int _value) {
+    setDepth(chan1_depth, _value, chan3_depth);
+    cp5.getController("seq_offset").setValue(cp5.getController("seq_offset").getValue());
+  }
+
+  public void set_chan3_depth(int _value) {
+    setDepth(chan1_depth, chan2_depth, _value);
+    cp5.getController("seq_offset").setValue(cp5.getController("seq_offset").getValue());
+  }
+
+public void depth(int value) {
+    palette_depth = value;
+    cp5.getController("seq_offset").setValue(cp5.getController("seq_offset").getValue());
+  }
 
 public void enable_all(int the_value) {
   for (int i = 0; i < shifters.length; ++i) {
@@ -234,12 +347,12 @@ public void layer(int theValue) {
 
 public void order(int theValue) {
   order = theValue;
-  sequence = dataToSwatches(rawData);
+  sequence = dataToSwatches(offset);
 }
 
 public void shift(int theValue) {
   order_shift = theValue;
-  sequence = dataToSwatches(rawData);
+  sequence = dataToSwatches(offset);
 }
 
 public void direction(int theValue) {
@@ -268,34 +381,124 @@ public void invert(int theValue) {
 public void generate() {
   randomized.randomize();
   if (mapped) sortPalette(sortMode);
-  sequence = dataToSwatches(rawData);
+  sequence = dataToSwatches(offset);
 }
 
 public void sort_mode(int theValue) {
   if (theValue >= 0) sortMode = theValue;
   if (mapped) sortPalette(sortMode);
-  sequence = dataToSwatches(rawData);
+  sequence = dataToSwatches(offset);
 }
 
 public void mapping(int theValue) {
   switch(theValue) {
-  case 1:
+  case 1: // colors are mapped to a palette based on an index derived from the data
     mapped = true;
     sort_radio.show();
-    cp5.getController("generate").show();
-    cp5.getController("shift").show();
     color_radio.hide();
+    cp5.getController("generate").show();
     sortPalette(sortMode);
+
+    if (data_type=="BYTE") {
+      order_slider.hide();
+      shift_slider.show();
+      depth_slider.show();
+      ch1_slider.hide();
+      ch2_slider.hide();
+      ch3_slider.hide();
+    } else {
+      order_slider.show();
+      shift_slider.show();
+      depth_slider.hide();
+      ch1_slider.hide();
+      ch2_slider.hide();
+      ch3_slider.hide();
+    }
+
     break;
-  case 0: // colors are mapped acording to grouped nucleotide values
+  case 0: // color values are interpreted directly from the raw data and scaled to a 24bit color space
     mapped = false;
     sort_radio.hide();
     cp5.getController("generate").hide();
     cp5.getController("shift").hide();
     color_radio.show();
+
+    if (data_type=="BYTE") {
+      order_slider.show();
+      shift_slider.hide();
+      depth_slider.hide();
+      ch1_slider.show();
+      ch2_slider.show();
+      ch3_slider.show();
+    } else {
+      order_slider.show();
+      shift_slider.hide();
+      depth_slider.hide();
+      ch1_slider.hide();
+      ch2_slider.hide();
+      ch3_slider.hide();
+    }
+
     break;
   }
-  sequence = dataToSwatches(rawData);
+  cp5.getController("seq_offset").setValue(cp5.getController("seq_offset").getValue());
+  sequence = dataToSwatches(offset);
+}
+
+public void data_type(int theValue) {
+  switch(theValue) {
+  case 0:
+    data_type = "DNA";
+    cp5.getController("seq_offset").setValue(cp5.getController("seq_offset").getValue());
+    order_slider
+      .setRange(0, orders.length-1)
+      .setSize(120, GUISize)
+      .setNumberOfTickMarks(orders.length-1);
+
+    if (mapped) {
+      order_slider.show();
+      shift_slider.show();
+      depth_slider.hide();
+      ch1_slider.hide();
+      ch2_slider.hide();
+      ch3_slider.hide();
+    } else {
+      order_slider.show();
+      shift_slider.hide();
+      depth_slider.show();
+      ch1_slider.hide();
+      ch2_slider.hide();
+      ch3_slider.hide();
+    }
+
+    break;
+  case 1:
+    data_type = "BYTE";
+    cp5.getController("seq_offset").setValue(cp5.getController("seq_offset").getValue());
+    order_slider
+      .setRange(0, 5)
+      .setSize(120, GUISize)
+      .setNumberOfTickMarks(6);
+
+    if (mapped) {
+      order_slider.hide();
+      shift_slider.show();
+      depth_slider.show();
+      ch1_slider.hide();
+      ch2_slider.hide();
+      ch3_slider.hide();
+    } else {
+      order_slider.show();
+      shift_slider.hide();
+      depth_slider.hide();
+      ch1_slider.show();
+      ch2_slider.show();
+      ch3_slider.show();
+    }
+
+    break;
+  }
+  sequence = dataToSwatches(offset);
 }
 
 public void color_mode(int theValue) {
@@ -314,8 +517,8 @@ public void color_mode(int theValue) {
 
 public void select_sequence(int theValue) {
   if (theValue >=0) {
-    loadSequence(sequences[theValue]);
-    offset = int(cp5.getController("seq_offset").getValue() * sequence.swatches.size());
+    loadData(sequences[theValue]);
+    cp5.getController("seq_offset").setValue(0);
   }
 }
 
@@ -337,5 +540,17 @@ public void render_mode(int theValue) {
 }
 
 public void seq_offset(float theValue) {
-  offset = int(theValue * sequence.swatches.size());
+  switch(data_type) {
+  case "DNA":
+    offset = int(theValue * rawBytes.length/8.0);
+    break;
+  case "BYTE":
+    if (mapped) {
+      offset = int(theValue * rawBits.length()/float(palette_depth));
+    } else {
+      offset = int(theValue * rawBits.length()/float(rgb_depth));
+    }
+    break;
+  }
+
 }
