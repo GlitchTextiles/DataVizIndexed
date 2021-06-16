@@ -16,8 +16,8 @@ import controlP5.*;
 ControlFrame gui;
 
 //Control Frame Dimensions and Location
-int ControlFrame_w = 400;
-int ControlFrame_h = 550;
+int ControlFrame_w = 410;
+int ControlFrame_h = 540;
 int GUILocationX = 0;
 int GUILocationY = 10;
 String GUIName = "GUI";
@@ -46,10 +46,11 @@ String type = "DNA"; // DNA, BYTE, CHAR
 
 public void setup() {
   size(10, 10); // final size of a PPCW throw design
+  frameRate(30);
+  noSmooth();
+  
   surface.setSize(screen_width, screen_height);
   surface.setLocation(ControlFrame_w, 0);
-
-  background(0);
 
   //load the palette: convert from hex values in a .txt to Swatches object
   palette = new Swatches(loadStrings(dataPath("")+"/palette/palette.txt"));
@@ -82,22 +83,12 @@ public void setup() {
 
   //setup GUI
   gui = new ControlFrame(this, GUILocationX, GUILocationY, ControlFrame_w, ControlFrame_h);
-
-  noLoop();
-  noSmooth();
   
   // needed to make sure all the GUI elements load before exiting setup()
-  int count = -1;
-  while ( count != 0 ) {
-    int nulls = 0;
-    for (int i = 0; i < gui.shifters.length; ++i) {
-      if (gui.shifters[i] == null) {
-        ++nulls;
-      }
-    }
-    count = nulls;
+  while ( ! gui.shiftersAreLoaded() ){
   }
   
+  background(0);
 }
 
 public void draw() {
