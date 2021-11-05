@@ -19,7 +19,7 @@ int controls_h = 550;
 boolean loading = false;
 
 //main window dimensions and location
-int graphics_width = 96;
+int graphics_width = 384;
 int graphics_height = 500;
 BitSet rawBits = new BitSet();
 Swatches palette, sequence, randomized;
@@ -50,7 +50,7 @@ boolean open = false;
 String data_type = "DNA"; // DNA, BYTE
 
 public void setup() {
-  size(550, 550);
+  size(850, 550);
 
   setDepth(chan1_depth, chan2_depth, chan3_depth);
 
