@@ -465,7 +465,7 @@ public void data_type(int theValue) {
     } else {
       order_slider.show();
       shift_slider.hide();
-      depth_slider.show();
+      depth_slider.hide();
       ch1_slider.hide();
       ch2_slider.hide();
       ch3_slider.hide();
