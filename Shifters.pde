@@ -8,15 +8,15 @@ public class Shifter {
   private int  noise_octaves, position_x, position_y, size, buffer, seed;
   private float shift, start, end, scale, noise_falloff;
   private ControlP5 controls;
-  controlP5.Label label;
-  controlP5.Range range;
+  Label label;
+  Range range;
+  PApplet parent;
 
   public Shifter(int x, int y, int size, int buffer, PApplet applet) {
     this.size=size;
     this.buffer=buffer;
     this.position_x = x;
     this.position_y = y;
-    this.controls = new ControlP5(applet);
     this.active = false;
     this.mode = "CHOP";
     this.direction = "HORIZONTAL";
@@ -27,9 +27,12 @@ public class Shifter {
     this.noise_octaves = 4;
     this.noise_falloff = 0.5;
     this.seed = 0;
+    this.parent = applet;
+    initControls();
+  }
 
-    // controls are visible by default
-    controls.show();
+  public void initControls() {
+    this.controls = new ControlP5(parent);
 
     controls.addToggle("active")
       .setLabel("enable")
@@ -41,7 +44,7 @@ public class Shifter {
     label = controls.getController("active").getCaptionLabel();
     label.align(ControlP5.CENTER, CENTER);
 
-    controls.addRange("the_range")
+    range = controls.addRange("the_range")
       .setLabel("range")
       .setPosition(gridx(1), gridy(0))
       .setSize(8*(size+buffer), size)
@@ -102,7 +105,7 @@ public class Shifter {
       .plugTo(this, "setOctaves")
       .setValue(4)
       ;
-      label = controls.getController("octaves").getCaptionLabel();
+    label = controls.getController("octaves").getCaptionLabel();
     label.align(ControlP5.CENTER, CENTER);
 
     controls.addSlider("fade")
@@ -121,23 +124,22 @@ public class Shifter {
       .plugTo(this, "setSeed")
       .setValue(0)
       ;
-      label = controls.getController("noise_seed").getCaptionLabel();
+    label = controls.getController("noise_seed").getCaptionLabel();
     label.align(ControlP5.CENTER, CENTER);
-      
+
+    controls.addBang("reset_controls")
+      .setPosition(gridx(8), gridy(3))
+      .setSize(size, size)
+      .setLabel("reset")
+      .plugTo(this, "reset")
+      ;
+    label = controls.getController("reset_controls").getCaptionLabel();
+    label.align(ControlP5.CENTER, CENTER);
   }
 
-  void reset() {
-    range.setRangeValues(0, 1);
-    controls.getController("active").setValue(0);
-    controls.getController("effect").setValue(0);
-    controls.getController("LRUD").setValue(0);
-    controls.getController("shift_pixels").setValue(0);
-    controls.getController("amplitude").setValue(0);
-    controls.getController("octaves").setValue(4);
-    controls.getController("fade").setValue(0.5);
-    controls.getController("noise_seed").setValue(0);
+  public void reset() {
+    initControls();
   }
-
 
   public void controlEvent(ControlEvent theControlEvent) {
     if (theControlEvent.isFrom("the_range")) {
@@ -145,6 +147,7 @@ public class Shifter {
       this.end = theControlEvent.getController().getArrayValue(1);
     }
   }
+
 
   public void show() {
     this.controls.show();
@@ -182,6 +185,10 @@ public class Shifter {
       this.direction = "VERTICAL";
       break;
     }
+  }
+
+  public void setRange(float[] _value) {
+    println(_value);
   }
 
   public void setStart(float start) {

@@ -2,34 +2,38 @@
 // Render the data into a design
 
 public PGraphics render(int start, String renderMode, String colorMode, boolean invert) {
+
   color[] colors;
   
   int mask = 0;
-  PGraphics graphics = createGraphics(screen_width, screen_height); // starting size of a PCW throw design
+  PGraphics graphics = createGraphics(graphics_width,  graphics_height); // starting size of a PCW throw design
   if (invert) mask = 0x00ffffff;
   graphics.beginDraw();
   graphics.strokeWeight(1);
+  int value = 0;
   switch(renderMode) {
   case "HORIZONTAL":
     for (int i = 0; i < graphics.height; i++) {
+      value = sequence.get(i % sequence.size()).c ^ mask;
       if (colorMode.equals("RGB")) {
-        graphics.stroke(palette.rgbClosest(sequence.get((i+start) % sequence.size()).c ^ mask).c);
+        graphics.stroke(palette.rgbClosest(value).c);
       } else if (colorMode.equals("HSB")) {
-        graphics.stroke(palette.hsbClosest(sequence.get((i+start) % sequence.size()).c ^ mask).c);
+        graphics.stroke(palette.hsbClosest(value).c);
       } else if (colorMode.equals("AVG")) {
-        graphics.stroke(palette.closest(sequence.get((i+start) % sequence.size()).c ^ mask).c);
+        graphics.stroke(palette.closest(value).c);
       }
       graphics.line(-1, i, graphics.width, i);
     }
     break;
   case "VERTICAL":
     for (int i = 0; i < graphics.width; i++) {
+      value = sequence.get(i % sequence.size()).c ^ mask;
       if (colorMode.equals("RGB")) {
-        graphics.stroke(palette.rgbClosest(sequence.get((i+start) % sequence.size()).c ^ mask).c);
+        graphics.stroke(palette.rgbClosest(value).c);
       } else if (colorMode.equals("HSB")) {
-        graphics.stroke(palette.hsbClosest(sequence.get((i+start) % sequence.size()).c ^ mask).c);
+        graphics.stroke(palette.hsbClosest(value).c);
       } else if (colorMode.equals("AVG")) {
-        graphics.stroke(palette.closest(sequence.get((i+start) % sequence.size()).c ^ mask).c);
+        graphics.stroke(palette.closest(value).c);
       }
       graphics.line(i, -1, i, graphics.height);
     }
